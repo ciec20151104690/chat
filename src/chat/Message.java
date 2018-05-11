@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 
 
+
+
 public class Message implements Serializable {
 	private String srcUser;//发送者
 	private String dstUser;//接收者
@@ -29,3 +31,49 @@ public class Message implements Serializable {
 	
 }
 
+class ChatMessage extends Message {
+	private String msgContent;
+
+	public String getMsgContent() {
+		return msgContent;
+	}
+
+	public void setMsgContent(String msgContent) {
+		this.msgContent = msgContent;
+	}
+
+	public ChatMessage(String srcUser, String dstUser, String msgContent) {
+		super(srcUser, dstUser);
+		this.msgContent = msgContent;
+	}
+	
+	public boolean isPubChatMessage() {
+		return getDstUser().equals("");
+	}
+}
+
+class UserStateMessage extends Message {
+	private boolean userOnline;
+	
+	public UserStateMessage(String srcUser, String dstUser) {
+		super(srcUser, dstUser);
+		// TODO Auto-generated constructor stub
+		
+		
+		
+	}
+
+	public boolean isUserOnline() {
+		return userOnline;
+	}
+
+	public void setUserOnline(boolean userOnline) {
+		this.userOnline = userOnline;
+	}
+
+	public UserStateMessage(String srcUser, String dstUser, boolean userOnline) {
+		super(srcUser, dstUser);
+		this.userOnline = userOnline;
+	}
+	
+}
