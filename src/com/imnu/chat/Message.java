@@ -1,4 +1,4 @@
-package chat;
+package com.imnu.chat;
 
 import java.io.Serializable;
 

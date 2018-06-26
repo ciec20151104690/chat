@@ -1,6 +1,9 @@
-package chat;
+package com.imnu.chat;
 
 import java.awt.EventQueue;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -14,6 +17,13 @@ import javax.swing.JTextPane;
 
 public class Client {
 
+	private final int port = 9999;//端口号
+	private Socket socket;
+	ObjectInputStream ois;//文件输入流
+	ObjectOutputStream oos;//文件输出流
+	private String localUserName;
+	
+	
 	private JFrame frame;
 	private JTextField textFieldUserName;
 	private JPasswordField passwordFieldpwd;
