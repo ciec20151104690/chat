@@ -14,6 +14,13 @@ import java.awt.Component;
 import javax.swing.Box;
 import javax.swing.JPasswordField;
 import javax.swing.JTextPane;
+import javax.swing.JScrollPane;
+import javax.swing.border.TitledBorder;
+import javax.swing.UIManager;
+import javax.swing.JList;
+import javax.swing.ListModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Client {
 
@@ -74,30 +81,49 @@ public class Client {
 		label.setBounds(184, 3, 45, 18);
 		frame.getContentPane().add(label);
 		
-		JButton btnNewButton = new JButton("\u767B\u9646");
-		btnNewButton.setBounds(343, -1, 80, 27);
-		frame.getContentPane().add(btnNewButton);
-		
-		JButton btnNewButton_1 = new JButton("\u6CE8\u518C");
-		btnNewButton_1.setBounds(437, 0, 80, 25);
-		frame.getContentPane().add(btnNewButton_1);
+		JButton btnLogin = new JButton("\u767B\u9646");
+		btnLogin.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (btnLogin.getText().equals("登录")) {
+					localUserName = textFieldUserName.getText().trim();
+				}
+					
+			}
+		});
+		btnLogin.setBounds(386, -1, 104, 26);
+		frame.getContentPane().add(btnLogin);
 		
 		passwordFieldpwd = new JPasswordField();
 		passwordFieldpwd.setBounds(225, 0, 104, 24);
 		frame.getContentPane().add(passwordFieldpwd);
-		
-		JTextPane textPaneMsgRecord = new JTextPane();
-		textPaneMsgRecord.setText("\u6D88\u606F\u8BB0\u5F55");
-		textPaneMsgRecord.setBounds(14, 49, 424, 202);
-		frame.getContentPane().add(textPaneMsgRecord);
 		
 		textFieldMsgToSend = new JTextField();
 		textFieldMsgToSend.setBounds(14, 279, 313, 24);
 		frame.getContentPane().add(textFieldMsgToSend);
 		textFieldMsgToSend.setColumns(10);
 		
-		JButton btnNewButton_2 = new JButton("\u53D1\u9001\u6D88\u606F");
-		btnNewButton_2.setBounds(345, 278, 93, 27);
-		frame.getContentPane().add(btnNewButton_2);
+		JButton btnSendMsg = new JButton("\u53D1\u9001\u6D88\u606F");
+		btnSendMsg.setBounds(345, 278, 93, 27);
+		frame.getContentPane().add(btnSendMsg);
+		
+		JScrollPane scrollPaneMsgRecord = new JScrollPane();
+		scrollPaneMsgRecord.setBounds(10, 37, 307, 229);
+		scrollPaneMsgRecord.setViewportBorder(new TitledBorder(UIManager
+						.getBorder("TitledBorder.border"), "\u6D88\u606F\u8BB0\u5F55",
+						TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		frame.getContentPane().add(scrollPaneMsgRecord);
+		
+		JTextPane textPane = new JTextPane();
+		scrollPaneMsgRecord.setViewportView(textPane);
+		
+		JScrollPane scrollPaneOnlineUsers = new JScrollPane();
+		scrollPaneOnlineUsers.setBounds(331, 39, 198, 226);
+		scrollPaneOnlineUsers.setViewportBorder(new TitledBorder(null,
+						"\u5728\u7EBF\u7528\u6237", TitledBorder.LEADING,
+						TitledBorder.TOP, null, null));
+		frame.getContentPane().add(scrollPaneOnlineUsers);
+		
+		JList<String> listOnlineUsers = new JList<String>((ListModel) null);
+		scrollPaneOnlineUsers.setViewportView(listOnlineUsers);
 	}
 }
