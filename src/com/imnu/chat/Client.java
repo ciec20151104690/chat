@@ -18,8 +18,12 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextPane;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
+
+import com.imnu.chat.UserStateMessage;
+
 import javax.swing.UIManager;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.ListModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -85,19 +89,34 @@ public class Client {
 			public void actionPerformed(ActionEvent arg0) {
 				if (btnLogin.getText().equals("登录")) {
 					localUserName = textFieldUserName.getText().trim();
-				}
-				if (localUserName.length() > 0) {
-					try {
-						socket = new Socket("127.0.0.1", 9999);
-						oos = new ObjectOutputStream(socket
-								.getOutputStream());
-						ois = new ObjectInputStream(socket.getInputStream());
-					} catch (UnknownHostException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+
+					if (localUserName.length() > 0) {
+						try {
+							socket = new Socket("127.0.0.1", 9999);
+							oos = new ObjectOutputStream(socket.getOutputStream());
+							ois = new ObjectInputStream(socket.getInputStream());
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				} else if (btnLogin.getText().equals("退出")) {
+					if (JOptionPane.showConfirmDialog(null, "是否退出?", "退出确认",
+							JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION) {
+
+						UserStateMessage userStateMessage = new UserStateMessage(localUserName, "", false);
+						try {
+							synchronized (oos) {
+								oos.writeObject(userStateMessage);
+								oos.flush();
+							}
+							System.exit(0);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
 					}
 				}
 			}
