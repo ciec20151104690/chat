@@ -6,10 +6,14 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.awt.BorderLayout;
+import java.awt.Color;
+
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import java.awt.Component;
@@ -19,6 +23,7 @@ import javax.swing.JTextPane;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
+import com.cauc.chat.Client.ListeningHandler;
 import com.imnu.chat.UserStateMessage;
 
 import javax.swing.UIManager;
@@ -33,7 +38,10 @@ public class Client {
 	ObjectInputStream ois;// 文件输入流
 	ObjectOutputStream oos;// 文件输出流
 	private String localUserName;
-
+	private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");//时间的格式
+	
+	
+	
 	private JFrame frame;
 	private JTextField textFieldUserName;
 	private JPasswordField passwordFieldpwd;
@@ -67,6 +75,7 @@ public class Client {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setTitle("客户端");
 		frame.setBounds(100, 100, 563, 363);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
@@ -102,6 +111,20 @@ public class Client {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
+						UserStateMessage userStateMessage = new UserStateMessage(
+								localUserName, "", true);
+						try {
+							oos.writeObject(userStateMessage);
+							oos.flush();//明天搜搜看
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						// 在“消息记录”文本框中用红色添加“XX时间登录成功”的信息
+						String msgRecord = dateFormat.format(new Date())
+								+ " 登录成功\r\n";
+						
+						btnLogin.setText("退出");
+							
 					}
 				} else if (btnLogin.getText().equals("退出")) {
 					if (JOptionPane.showConfirmDialog(null, "是否退出?", "退出确认",
