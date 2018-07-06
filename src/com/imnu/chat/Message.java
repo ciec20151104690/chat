@@ -8,7 +8,7 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 	private String srcUser;//发送者
-	private String dstUser;//接收者
+	private String dstUser;//
 	
 	public Message(String srcUser, String dstUser) {
 		super();

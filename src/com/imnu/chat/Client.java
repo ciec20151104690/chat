@@ -23,7 +23,6 @@ import javax.swing.JTextPane;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
 
-import com.cauc.chat.Client.ListeningHandler;
 import com.imnu.chat.UserStateMessage;
 
 import javax.swing.UIManager;
@@ -101,15 +100,18 @@ public class Client {
 
 					if (localUserName.length() > 0) {
 						try {
-							socket = new Socket("127.0.0.1", 9999);
+							socket = new Socket("127.0.0.1", 8888);
 							oos = new ObjectOutputStream(socket.getOutputStream());
 							ois = new ObjectInputStream(socket.getInputStream());
-						} catch (UnknownHostException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
+						} catch (UnknownHostException e1) {
+							JOptionPane.showMessageDialog(null, "找不到服务器主机");
+							e1.printStackTrace();
+							System.exit(0);
+						} catch (IOException e1) {
+							JOptionPane.showMessageDialog(null,
+									"服务器I/O错误，服务器未启动？");
+							e1.printStackTrace();
+							System.exit(0);
 						}
 						UserStateMessage userStateMessage = new UserStateMessage(
 								localUserName, "", true);
@@ -157,6 +159,10 @@ public class Client {
 		textFieldMsgToSend.setColumns(10);
 
 		JButton btnSendMsg = new JButton("\u53D1\u9001\u6D88\u606F");
+		btnSendMsg.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
 		btnSendMsg.setBounds(345, 278, 93, 27);
 		frame.getContentPane().add(btnSendMsg);
 
