@@ -12,7 +12,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableModel;
 import javax.swing.JButton;
 
-public class Server {
+public class Server extends JFrame {
 
 	private JFrame JFrame;
 	private JTable tableOnlineUsers;

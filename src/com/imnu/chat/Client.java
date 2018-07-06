@@ -38,13 +38,13 @@ public class Client {
 	ObjectOutputStream oos;// 文件输出流
 	private String localUserName;
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");//时间的格式
-	
-	
+
 	
 	private JFrame frame;
 	private JTextField textFieldUserName;
 	private JPasswordField passwordFieldpwd;
 	private JTextField textFieldMsgToSend;
+	private JButton btnSendMsg;
 
 	/**
 	 * Launch the application.
@@ -125,7 +125,8 @@ public class Client {
 						String msgRecord = dateFormat.format(new Date())
 								+ " 登录成功\r\n";
 						
-						btnLogin.setText("退出");
+						btnLogin.setText("退出"); 
+						btnSendMsg.setEnabled(true);// 将发送消息按钮设为可用状态
 							
 					}
 				} else if (btnLogin.getText().equals("退出")) {
@@ -158,9 +159,11 @@ public class Client {
 		frame.getContentPane().add(textFieldMsgToSend);
 		textFieldMsgToSend.setColumns(10);
 
-		JButton btnSendMsg = new JButton("\u53D1\u9001\u6D88\u606F");
+		btnSendMsg = new JButton("\u53D1\u9001\u6D88\u606F");
+		btnSendMsg.setEnabled(false);
 		btnSendMsg.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
+			public void actionPerformed(ActionEvent e) {
+				
 			}
 		});
 		btnSendMsg.setBounds(345, 278, 93, 27);
