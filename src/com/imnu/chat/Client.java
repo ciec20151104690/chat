@@ -22,6 +22,10 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextPane;
 import javax.swing.JScrollPane;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 
 import com.imnu.chat.UserStateMessage;
 
@@ -29,10 +33,13 @@ import javax.swing.UIManager;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class Client {
+	private final int port = 8888;
 	private Socket socket;
 	ObjectInputStream ois;// 文件输入流
 	ObjectOutputStream oos;// 文件输出流
@@ -51,6 +58,7 @@ public class Client {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				try {
 					Client window = new Client();
@@ -100,7 +108,7 @@ public class Client {
 
 					if (localUserName.length() > 0) {
 						try {
-							socket = new Socket("127.0.0.1", 8888);
+							socket = new Socket("127.0.0.1", port);
 							oos = new ObjectOutputStream(socket.getOutputStream());
 							ois = new ObjectInputStream(socket.getInputStream());
 						} catch (UnknownHostException e1) {
@@ -159,16 +167,6 @@ public class Client {
 		frame.getContentPane().add(textFieldMsgToSend);
 		textFieldMsgToSend.setColumns(10);
 
-		btnSendMsg = new JButton("\u53D1\u9001\u6D88\u606F");
-		btnSendMsg.setEnabled(false);
-		btnSendMsg.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-			}
-		});
-		btnSendMsg.setBounds(345, 278, 93, 27);
-		frame.getContentPane().add(btnSendMsg);
-
 		JScrollPane scrollPaneMsgRecord = new JScrollPane();
 		scrollPaneMsgRecord.setBounds(10, 37, 307, 229);
 		scrollPaneMsgRecord.setViewportBorder(new TitledBorder(UIManager
@@ -181,6 +179,44 @@ public class Client {
 		JTextPane textPane = new JTextPane();
 		scrollPaneMsgRecord.setViewportView(textPane);
 
+		btnSendMsg = new JButton("\u53D1\u9001\u6D88\u606F");
+		btnSendMsg.setEnabled(false);
+		btnSendMsg.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String msgContent = textFieldMsgToSend.getText();
+				if (msgContent.length() > 0) {
+					String msgRecord = dateFormat.format(new Date()) + "向大家说:"
+							+ msgContent + "\r\n";
+					addMsgRecord(msgRecord, Color.blue, 12, false, false);
+				}
+				
+			}
+
+			private void addMsgRecord(final String msgRecord, Color msgColor, int fontSize, boolean isItalic, boolean isUnderline) {
+				
+				final SimpleAttributeSet attrset = new SimpleAttributeSet();
+				StyleConstants.setForeground(attrset, msgColor);
+				StyleConstants.setFontSize(attrset, fontSize);
+				StyleConstants.setUnderline(attrset, isUnderline);
+				StyleConstants.setItalic(attrset, isItalic);
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						Document docs = textPane.getDocument();
+						try {
+							docs.insertString(docs.getLength(), msgRecord, attrset);
+						} catch (BadLocationException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
+			}
+		});
+		btnSendMsg.setBounds(345, 278, 93, 27);
+		frame.getContentPane().add(btnSendMsg);
+
+		
 		JScrollPane scrollPaneOnlineUsers = new JScrollPane();
 		scrollPaneOnlineUsers.setBounds(331, 39, 198, 226);
 		scrollPaneOnlineUsers.setViewportBorder(new TitledBorder(null,

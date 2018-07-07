@@ -22,6 +22,13 @@ public class Server extends JFrame {
 	 */
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
+			
+			@Override
+			public String toString() {
+				// TODO Auto-generated method stub
+				return super.toString();
+			}
+
 			public void run() {
 				try {
 					Server window = new Server();
