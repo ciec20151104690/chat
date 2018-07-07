@@ -92,6 +92,17 @@ public class Client {
 		lblNewLabel.setBounds(0, 0, 65, 24);
 		frame.getContentPane().add(lblNewLabel);
 
+		JScrollPane scrollPaneMsgRecord = new JScrollPane();
+		scrollPaneMsgRecord.setBounds(10, 37, 307, 229);
+		scrollPaneMsgRecord.setViewportBorder(new TitledBorder(UIManager
+
+				.getBorder("TitledBorder.border"), "\u6D88\u606F\u8BB0\u5F55",
+
+				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		frame.getContentPane().add(scrollPaneMsgRecord);
+
+		JTextPane textPane = new JTextPane();
+		scrollPaneMsgRecord.setViewportView(textPane);
 		textFieldUserName = new JTextField();
 		textFieldUserName.setBounds(56, 0, 114, 24);
 		frame.getContentPane().add(textFieldUserName);
@@ -155,6 +166,29 @@ public class Client {
 					}
 				}
 			}
+
+						private void addMsgRecord(final String msgRecord, Color msgColor, int fontSize, boolean isItalic, boolean isUnderline) {
+				
+				final SimpleAttributeSet attrset = new SimpleAttributeSet();
+				StyleConstants.setForeground(attrset, msgColor);
+				StyleConstants.setFontSize(attrset, fontSize);
+				StyleConstants.setUnderline(attrset, isUnderline);
+				StyleConstants.setItalic(attrset, isItalic);
+				SwingUtilities.invokeLater(new Runnable() {
+					@Override
+					public void run() {
+						Document docs = textPane.getDocument();
+						try {
+							docs.insertString(docs.getLength(), msgRecord, attrset);
+						} catch (BadLocationException e) {
+							e.printStackTrace();
+						}
+					}
+				});
+				
+			}
+
+			
 		});
 		btnLogin.setBounds(386, -1, 104, 26);
 		frame.getContentPane().add(btnLogin);
@@ -168,17 +202,7 @@ public class Client {
 		frame.getContentPane().add(textFieldMsgToSend);
 		textFieldMsgToSend.setColumns(10);
 
-		JScrollPane scrollPaneMsgRecord = new JScrollPane();
-		scrollPaneMsgRecord.setBounds(10, 37, 307, 229);
-		scrollPaneMsgRecord.setViewportBorder(new TitledBorder(UIManager
-
-				.getBorder("TitledBorder.border"), "\u6D88\u606F\u8BB0\u5F55",
-
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		frame.getContentPane().add(scrollPaneMsgRecord);
-
-		JTextPane textPane = new JTextPane();
-		scrollPaneMsgRecord.setViewportView(textPane);
+		
 
 		btnSendMsg = new JButton("\u53D1\u9001\u6D88\u606F");
 		btnSendMsg.setEnabled(false);
@@ -242,4 +266,6 @@ public class Client {
 		JList<String> listOnlineUsers = new JList<String>((ListModel) null);
 		scrollPaneOnlineUsers.setViewportView(listOnlineUsers);
 	}
+
+	
 }

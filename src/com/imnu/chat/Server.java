@@ -33,6 +33,8 @@ import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+import com.cauc.chat.ChatMessage;
+
 @SuppressWarnings("serial")
 public class Server extends JFrame {
 	private ServerSocket serverSocket;
@@ -190,6 +192,28 @@ public class Server extends JFrame {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+				}
+			}
+			// 处理用户发来的聊天消息
+			private void processChatMessage(ChatMessage msg) {
+				String srcUser = msg.getSrcUser();
+				String dstUser = msg.getDstUser();
+				String msgContent = msg.getMsgContent();
+				if (userManager.hasUser(srcUser)) {
+					// 用黑色文字将收到消息的时间、发送消息的用户名和消息内容添加到“消息记录”文本框中
+					final String msgRecord = dateFormat.format(new Date()) + " "
+							+ srcUser + "说: " + msgContent + "\r\n";
+					addMsgRecord(msgRecord, Color.black, 12, false, false);
+					if (msg.isPubChatMessage()) {
+						// 将公聊消息转发给所有其它在线用户
+						transferMsgToOtherUsers(msg);
+					} else {
+						// 将私聊消息转发给目标用户，这里未实现
+					}
+				} else {
+					// 这种情况对应着用户未发送上线消息就直接发送了聊天消息，应该发消息提示客户端，这里从略
+					System.err.println("用启未发送上线消息就直接发送了聊天消息");
+					return;
 				}
 			}
 		}
