@@ -33,7 +33,9 @@ import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-import com.cauc.chat.ChatMessage;
+import com.imnu.chat.ChatMessage;
+import com.imnu.chat.Message;
+import com.imnu.chat.UserStateMessage;
 
 @SuppressWarnings("serial")
 public class Server extends JFrame {
@@ -175,7 +177,41 @@ public class Server extends JFrame {
 				e.printStackTrace();
 			}
 		}
-
+		@Override
+		public void run() {
+			try {
+				while (true) {
+					Message msg = (Message) ois.readObject();
+					if (msg instanceof UserStateMessage) {
+						// 处理用户状态消息
+						processUserStateMessage((UserStateMessage) msg);
+					} else if (msg instanceof ChatMessage) {
+						// 处理聊天消息
+						processChatMessage((ChatMessage) msg);
+					} else {
+						// 这种情况对应着用户发来的消息格式 错误，应该发消息提示用户，这里从略
+						System.err.println("用户发来的消息格式错误!");
+					}
+				}
+			} catch (IOException e) {
+				if (e.toString().endsWith("Connection reset")) {
+					System.out.println("客户端退出");
+					// 如果用户未发送下线消息就直接关闭了客户端，应该在这里补充代码，删除用户在线信息
+				} else {
+					e.printStackTrace();
+				}
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} finally {
+				if (currentUserSocket != null) {
+					try {
+						currentUserSocket.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 
 
 		// 向其它用户转发消息
