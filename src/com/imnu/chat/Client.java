@@ -11,7 +11,6 @@ import java.util.Date;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import java.awt.BorderLayout;
 
 import java.awt.Color;
 
@@ -134,6 +133,7 @@ public class Client {
 						// 在“消息记录”文本框中用红色添加“XX时间登录成功”的信息
 						String msgRecord = dateFormat.format(new Date())
 								+ " 登录成功\r\n";
+						addMsgRecord(msgRecord, Color.red, 12, false, false);
 						btnLogin.setText("退出"); 
 						btnSendMsg.setEnabled(true);// 将发送消息按钮设为可用状态
 							
