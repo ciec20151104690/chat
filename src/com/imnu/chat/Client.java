@@ -27,6 +27,7 @@ import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
+
 import com.imnu.chat.UserStateMessage;
 
 import javax.swing.UIManager;
@@ -185,6 +186,18 @@ public class Client {
 			public void actionPerformed(ActionEvent e) {
 				String msgContent = textFieldMsgToSend.getText();
 				if (msgContent.length() > 0) {
+					ChatMessage chatMessage = new ChatMessage(localUserName,
+							"", msgContent);
+					try {
+						synchronized (oos) {
+							oos.writeObject(chatMessage);
+							oos.flush();
+						}
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+					
+					
 					String msgRecord = dateFormat.format(new Date()) + "向大家说:"
 							+ msgContent + "\r\n";
 					addMsgRecord(msgRecord, Color.blue, 12, false, false);
