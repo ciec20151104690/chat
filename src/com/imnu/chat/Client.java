@@ -27,7 +27,8 @@ import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 
-
+import com.cauc.chat.ChatMessage;
+import com.cauc.chat.Message;
 import com.imnu.chat.UserStateMessage;
 
 import javax.swing.UIManager;
@@ -265,6 +266,90 @@ public class Client {
 
 		JList<String> listOnlineUsers = new JList<String>((ListModel) null);
 		scrollPaneOnlineUsers.setViewportView(listOnlineUsers);
+		
+		// 后台监听线程
+		class ListeningHandler implements Runnable {
+			@Override//重写
+			public void run() {
+				try {
+					while (true) {
+						Message msg = null;
+						synchronized (ois) {
+							msg = (Message) ois.readObject();
+						}
+						if (msg instanceof UserStateMessage) {
+							// 处理用户状态消息
+							processUserStateMessage((UserStateMessage) msg);
+						} else if (msg instanceof ChatMessage) {
+							// 处理聊天消息  根据不同的消息类型进行相应处理
+							processChatMessage((ChatMessage) msg);
+						} else {
+							// 这种情况对应着用户发来的消息格式 错误，应该发消息提示用户，这里从略
+							System.err.println("用户发来的消息格式错误!");
+						}
+					}
+				} catch (IOException e) {
+					if (e.toString().endsWith("Connection reset")) {
+						System.out.println("服务器端退出");
+					} else {
+						e.printStackTrace();
+					}
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				} finally {
+					if (socket != null) {
+						try {
+							socket.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+
+			// 处理用户状态消息
+			private void processUserStateMessage(UserStateMessage msg) {
+				String srcUser = msg.getSrcUser();
+				String dstUser = msg.getDstUser();
+				if (msg.isUserOnline()) {
+					if (msg.isPubUserStateMessage()) { // 新用户上线消息
+						// 用绿色文字将用户名和用户上线时间添加到“消息记录”文本框中
+						final String msgRecord = dateFormat.format(new Date())
+								+ " " + srcUser + "上线了!\r\n";
+						addMsgRecord(msgRecord, Color.green, 12, false, false);
+						// 在“在线用户”列表中增加新上线的用户名
+						onlinUserDlm.addElement(srcUser);
+					}
+					if (dstUser.equals(localUserName)) { // 用户在线消息
+						onlinUserDlm.addElement(srcUser);
+					}
+				} else if (msg.isUserOffline()) { // 用户下线消息
+					if (onlinUserDlm.contains(srcUser)) {
+						// 用绿色文字将用户名和用户下线时间添加到“消息记录”文本框中
+						final String msgRecord = dateFormat.format(new Date())
+								+ " " + srcUser + "下线了!\r\n";
+						addMsgRecord(msgRecord, Color.green, 12, false, false);
+						// 在“在线用户”列表中删除下线的用户名
+						onlinUserDlm.removeElement(srcUser);
+					}
+				}
+			}
+
+			// 处理服务器转发来的公聊消息
+			private void processChatMessage(ChatMessage msg) {
+				String srcUser = msg.getSrcUser();
+				String dstUser = msg.getDstUser();
+				String msgContent = msg.getMsgContent();
+				if (onlinUserDlm.contains(srcUser)) {
+					if (msg.isPubChatMessage() || dstUser.equals(localUserName)) {
+						// 用黑色文字将收到消息的时间、发送消息的用户名和消息内容添加到“消息记录”文本框中
+						final String msgRecord = dateFormat.format(new Date())
+								+ " " + srcUser + "说: " + msgContent + "\r\n";
+						addMsgRecord(msgRecord, Color.black, 12, false, false);
+					}
+				}
+			}
+		}
 	}
 
 	
