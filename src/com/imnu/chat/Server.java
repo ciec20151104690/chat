@@ -230,6 +230,66 @@ public class Server extends JFrame {
 					}
 				}
 			}
+		}
+		// 处理用户状态消息
+		private void processUserStateMessage(UserStateMessage msg) {
+			String srcUser = msg.getSrcUser();
+			if (msg.isUserOnline()) { // 用户上线消息
+				if (userManager.hasUser(srcUser)) {
+					// 这种情况对应着用户重复登录，应该发消息提示客户端，这里从略
+					System.err.println("用户重复登录");
+					return;
+				}
+				// 向新上线的用户转发当前在线用户列表
+				String[] users = userManager.getAllUsers();
+				try {
+					for (String user : users) {
+						UserStateMessage userStateMessage = new UserStateMessage(
+								user, srcUser, true);
+						synchronized (userStateMessage) {
+							oos.writeObject(userStateMessage);
+							oos.flush();
+						}
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				// 向所有其它在线用户转发用户上线消息
+				transferMsgToOtherUsers(msg);
+				// 将用户信息加入到“在线用户”列表中
+				onlineUsersDtm.addRow(new Object[] { srcUser,
+						currentUserSocket.getInetAddress().getHostAddress(),
+						currentUserSocket.getPort(),
+						dateFormat.format(new Date()) });
+				userManager.addUser(srcUser, currentUserSocket, oos, ois);
+				// 用绿色文字将用户名和用户上线时间添加到“消息记录”文本框中
+				String ip = currentUserSocket.getInetAddress().getHostAddress();
+				final String msgRecord = dateFormat.format(new Date()) + " "
+						+ srcUser + "(" + ip + ")" + "上线了!\r\n";
+				addMsgRecord(msgRecord, Color.green, 12, false, false);
+			} else { // 用户下线消息
+				if (!userManager.hasUser(srcUser)) {
+					// 这种情况对应着用户未发送上线消息就直接发送了下线消息，应该发消息提示客户端，这里从略
+					System.err.println("用户未发送登录消息就发送了下线消息");
+					return;
+				}
+				// 用绿色文字将用户名和用户下线时间添加到“消息记录”文本框中
+				String ip = userManager.getUserSocket(srcUser).getInetAddress()
+						.getHostAddress();
+				final String msgRecord = dateFormat.format(new Date()) + " "
+						+ srcUser + "(" + ip + ")" + "下线了!\r\n";
+				addMsgRecord(msgRecord, Color.green, 12, false, false);
+				// 在“在线用户列表”中删除下线用户
+				userManager.removeUser(srcUser);
+				for (int i = 0; i < onlineUsersDtm.getRowCount(); i++) {
+					if (onlineUsersDtm.getValueAt(i, 0).equals(srcUser)) {
+						onlineUsersDtm.removeRow(i);
+					}
+				}
+				// 将用户下线消息转发给所有其它在线用户
+				transferMsgToOtherUsers(msg);
+			}
+		}
 			// 处理用户发来的聊天消息
 			private void processChatMessage(ChatMessage msg) {
 				String srcUser = msg.getSrcUser();
@@ -391,4 +451,4 @@ class User {
 	}
 
 }
-}
+
